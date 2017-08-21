@@ -9,7 +9,6 @@ var app = express();
 
 app.use(bodyParser.json());
 
-//POST for creating resources
 app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text
@@ -19,6 +18,16 @@ app.post('/todos', (req, res) => {
     },(e) => {
         res.status(400).send(e);
     });
+});
+
+app.get('/todos', (req, res) => {
+    Todo.find().then((todos) => {
+        //Instead of sending an array, send an object so that you can
+        //add new properties later on
+        res.send({todos});
+    }, (e) => {
+        res.status(400).send(e);
+    })
 });
 
 app.listen(3000, () => {
