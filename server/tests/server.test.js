@@ -7,10 +7,13 @@ const {Todo} = require('./../models/todo');
 
 const todos = [{
         _id: new ObjectID(),
-        text: 'Do the dishes'
+        text: 'Do the dishes',
+        completed: false
     },{
         _id: new ObjectID(),
-        text: 'Practice yoga'
+        text: 'Practice yoga',
+        completed: true,
+        completedAt: 333
     }];
 
 beforeEach((done) => {
@@ -108,7 +111,7 @@ describe('DELETE /todos/:id', () => {
             .delete(`/todos/${hexId}`)
             .expect(200)
             .expect((res) => {
-                expect(res.body.todo._id).toBe(hexId)
+                expect(res.body.todo._id).toBe(hexId);
             })
             .end((err, res) => {
                 if(err){
@@ -135,4 +138,47 @@ describe('DELETE /todos/:id', () => {
             .expect(404)
             .end(done);
     });
+});
+
+describe('PATCH /todos/:id', () => {
+    it('should update the todo', (done) => {
+        var id = todos[0]._id.toHexString();
+        var text = 'Updated do the dishes';
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({
+                completed: true,
+                text
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(true);
+                expect(res.body.todo.completedAt).toBeA('number');
+            })
+            .end(done);
+    });
+
+     it('should clear completedAt when todo is not completed', (done) => {
+         var id = todos[1]._id.toHexString();
+         var text = 'Updated practice yoga';
+         request(app)
+            .patch(`/todos/${id}`)
+            .send({
+                text,
+                completed: false
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(false);
+                expect(res.body.todo.completedAt).toNotExist();
+            })
+            .end(done);
+        //grab id of second item
+        //update text, set completed to false
+        //200
+        //text is changed, completed false, completedAt is null .toNotExist
+    });
+
 });
