@@ -175,10 +175,6 @@ describe('PATCH /todos/:id', () => {
                 expect(res.body.todo.completedAt).toNotExist();
             })
             .end(done);
-        //grab id of second item
-        //update text, set completed to false
-        //200
-        //text is changed, completed false, completedAt is null .toNotExist
     });
 
 });
