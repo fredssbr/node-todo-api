@@ -34,10 +34,6 @@ var UserSchema = new mongoose.Schema({
 });
 
 /**
- * Model methods are used in the model, like User.findById
- */
-
-/**
  * The methods object of a mongoose.Schema is where we store
  * custom methods for the INSTANCE of the schema.
  * 
@@ -59,6 +55,28 @@ UserSchema.methods.toJSON = function() {
     var user = this;
     var userObject = user.toObject();
     return _.pick(userObject, ['_id', 'email']);
+};
+
+/**
+ * Model methods are used in the model, like User.findById
+ */
+UserSchema.statics.findByToken = function(token) {
+    var User = this;
+    var decoded;
+    try{
+        decoded = jwt.verify(token, 'abc123');
+    }catch(e){
+        /* return new Promise((resolve, reject) => {
+            reject();
+        }); */
+        return Promise.reject();
+    }
+
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
 };
 
 var User = mongoose.model('User', UserSchema);
